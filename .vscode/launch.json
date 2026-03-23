@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Backend (ts-node-dev)",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/server/src/app.ts",
+            "runtimeExecutable": "ts-node-dev",
+            "runtimeArgs": [
+                "--inspect",
+                "--transpile-only",
+                "--ignore-watch",
+                "node_modules"
+            ],
+            "cwd": "${workspaceFolder}/server",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "env": {
+                "NODE_ENV": "development"
+            }
+        }
+    ]
+}
