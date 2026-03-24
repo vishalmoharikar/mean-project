@@ -7,6 +7,9 @@ import { authMiddleware } from "./core/middleware/auth";
 import { createTask, getTasks } from "./modules/task/task.controller";
 import "reflect-metadata";
 import { errorHandler } from "./core/middleware/errorHandler";
+import { uploadFile } from "./modules/file/file.controller";
+import { upload } from "./modules/file/file.middleware";
+import { initContainer } from "./core/config/blob";
 
 
 const app = express();
@@ -24,8 +27,11 @@ app.get("/me", authMiddleware, (req: any, res) => {
 app.post("/tasks", authMiddleware, createTask);
 app.get("/tasks", authMiddleware, getTasks);
 
+app.post("/upload", authMiddleware, upload.single("file"), uploadFile);
+
 app.use(errorHandler);
-connectDB().then(() => {
+connectDB().then(async () => {
+    await initContainer();
     app.listen(config.port, () =>
         console.log(`Server running on ${config.port}`)
     );
