@@ -4,7 +4,7 @@ import { connectDB } from "./infra/db/mongo";
 import { config } from "./core/config/config";
 import { register, login } from "./modules/auth/auth.controller";
 import { authMiddleware } from "./core/middleware/auth";
-import { createTask, getTasks } from "./modules/task/task.controller";
+import { createTask, getTasks, createTaskWithFile } from "./modules/task/task.controller";
 import "reflect-metadata";
 import { errorHandler } from "./core/middleware/errorHandler";
 import { uploadFile } from "./modules/file/file.controller";
@@ -25,6 +25,7 @@ app.get("/me", authMiddleware, (req: any, res) => {
 });
 
 app.post("/tasks", authMiddleware, createTask);
+app.post("/tasks/upload", authMiddleware, upload.single("file"), createTaskWithFile);
 app.get("/tasks", authMiddleware, getTasks);
 
 app.post("/upload", authMiddleware, upload.single("file"), uploadFile);
