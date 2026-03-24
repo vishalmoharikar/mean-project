@@ -1,13 +1,10 @@
-import { Task } from './task.model';
 import { CreateTaskDto } from './task.validator';
 import { TaskRepository } from "./task.repo";
 import { injectable, inject } from "tsyringe";
-import { redis } from "../../infra/cache/redis";
-import { cacheGet, cacheSet } from './task.cache.helper';
+import { cacheGet, cacheSet, cacheDeletePattern } from '../../infra/cache/task.cache.helper';
 
 
 @injectable()
-
 export class TaskService {
     constructor(
         @inject(TaskRepository) private repo: TaskRepository
@@ -15,14 +12,8 @@ export class TaskService {
 
     async createTask(userId: string, createTaskDto: CreateTaskDto) {
         const task = this.repo.create({ userId, ...createTaskDto });
-
         const pattern = `tasks:${userId}:*`;
-        const keys = await redis.keys(pattern);
-
-        if (keys.length) {
-            await redis.del(keys);
-        }
-
+        await cacheDeletePattern(pattern);
         return task;
     }
 
