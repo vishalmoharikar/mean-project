@@ -1,10 +1,16 @@
+import { CreateTaskDto } from './task.validator';
 import { TaskRepository } from "./task.repo";
+import { injectable, inject } from "tsyringe";
+
+@injectable()
 
 export class TaskService {
-    repo = new TaskRepository();
+    constructor(
+        @inject(TaskRepository) private repo: TaskRepository
+    ) { }
 
-    async createTask(userId: string, title: string) {
-        return this.repo.create({ userId, title });
+    async createTask(userId: string, createTaskDto: CreateTaskDto) {
+        return this.repo.create({ userId, ...createTaskDto });
     }
 
     async getTasks(userId: string, page = 1, limit = 10) {

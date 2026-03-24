@@ -1,5 +1,7 @@
 import { Task } from "./task.model";
+import { injectable } from "tsyringe";
 
+@injectable()
 export class TaskRepository {
     create(data: any) {
         return Task.create(data);
