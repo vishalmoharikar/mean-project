@@ -3,6 +3,8 @@ import { TaskRepository } from "./task.repo";
 import { injectable, inject } from "tsyringe";
 import { cacheGet, cacheSet, cacheDeletePattern } from '../../infra/cache/task.cache.helper';
 import { publishEvent } from "../../infra/rabbitmq/publisher";
+import { NotificationService } from '../../services/notification.service';
+import { Logger } from '../../utils/logger';
 
 
 @injectable()
@@ -21,6 +23,11 @@ export class TaskService {
             taskId: task._id.toString(),
             title: task.title,
             userId: task.userId.toString(),
+        });
+        NotificationService.notifyUser(task.userId, "task.created", task);
+        Logger.info("Task created", {
+            taskId: task._id,
+            userId: task.userId,
         });
 
         return task;

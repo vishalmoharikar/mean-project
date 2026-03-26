@@ -12,10 +12,12 @@ import { upload } from "./modules/file/file.middleware";
 import { initContainer } from "./core/config/blob";
 import { connectRabbit } from "./infra/rabbitmq/connection";
 import { startConsumers } from "./infra/rabbitmq/consumer";
+import { correlationMiddleware } from "./core/middleware/correlation";
 
 
 const app = express();
 app.use(express.json());
+app.use(correlationMiddleware);
 
 app.get("/health", (req, res) => res.send("OK"));
 
@@ -35,9 +37,11 @@ app.post("/upload", authMiddleware, upload.single("file"), uploadFile);
 app.use(errorHandler);
 connectDB().then(async () => {
     await initContainer();
-    await connectRabbit();
-    await startConsumers();
+   // await connectRabbit();
+    
+   // await startConsumers();
     app.listen(config.port, () =>
         console.log(`Server running on ${config.port}`)
     );
 });
+export default app;

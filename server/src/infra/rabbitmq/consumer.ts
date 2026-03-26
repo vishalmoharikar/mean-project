@@ -1,3 +1,4 @@
+import { handleEvent } from "../../consumers/event.handlers";
 import { rabbitConfig } from "../../core/config/rabbitmq";
 import { getChannel } from "./connection";
 
@@ -17,8 +18,11 @@ export const startConsumers = async () => {
 
             try {
                 console.log("Consumed:", queue, content);
+                const routingKey = msg.fields.routingKey;
 
                 // handle logic (email/log/notification)
+                await handleEvent(routingKey, content);
+
                 channel.ack(msg);
             } catch (err) {
                 console.error(err);

@@ -1,6 +1,7 @@
 import { injectable } from "tsyringe";
 import { containerClient } from "../../core/config/blob";
 import { publishEvent } from "../../infra/rabbitmq/publisher";
+import { NotificationService } from "../../services/notification.service";
 
 interface UploadInput {
     taskId: string;
@@ -31,6 +32,11 @@ export class FileService {
             fileUrl,
             userId,
         }).catch(console.error);
+
+        NotificationService.notifyUser(userId, "file.uploaded", {
+            fileName: file.originalname,
+            fileUrl,
+        });
 
         return { fileUrl };
     };
