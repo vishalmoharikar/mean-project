@@ -10,6 +10,8 @@ import { errorHandler } from "./core/middleware/errorHandler";
 import { uploadFile } from "./modules/file/file.controller";
 import { upload } from "./modules/file/file.middleware";
 import { initContainer } from "./core/config/blob";
+import { connectRabbit } from "./infra/rabbitmq/connection";
+import { startConsumers } from "./infra/rabbitmq/consumer";
 
 
 const app = express();
@@ -33,6 +35,8 @@ app.post("/upload", authMiddleware, upload.single("file"), uploadFile);
 app.use(errorHandler);
 connectDB().then(async () => {
     await initContainer();
+    await connectRabbit();
+    await startConsumers();
     app.listen(config.port, () =>
         console.log(`Server running on ${config.port}`)
     );

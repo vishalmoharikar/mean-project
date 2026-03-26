@@ -2,6 +2,7 @@ import { CreateTaskDto } from './task.validator';
 import { TaskRepository } from "./task.repo";
 import { injectable, inject } from "tsyringe";
 import { cacheGet, cacheSet, cacheDeletePattern } from '../../infra/cache/task.cache.helper';
+import { publishEvent } from "../../infra/rabbitmq/publisher";
 
 
 @injectable()
@@ -10,10 +11,18 @@ export class TaskService {
         @inject(TaskRepository) private repo: TaskRepository
     ) { }
 
+
+
     async createTask(userId: string, createTaskDto: CreateTaskDto) {
-        const task = this.repo.create({ userId, ...createTaskDto });
+        const task = await this.repo.create({ userId, ...createTaskDto });
         const pattern = `tasks:${userId}:*`;
         await cacheDeletePattern(pattern);
+        await publishEvent("task.created", {
+            taskId: task._id.toString(),
+            title: task.title,
+            userId: task.userId.toString(),
+        });
+
         return task;
     }
 
